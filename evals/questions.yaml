@@ -1,0 +1,21 @@
+# Business questions for the LLM eval. `reference_sql` returns the one expected value.
+- question: How many orders were placed?
+  reference_sql: select count(*) from fct_orders
+- question: What was total revenue in US dollars, rounded to 2 decimals?
+  reference_sql: select round(sum(total_cents) / 100.0, 2) from fct_orders
+- question: What is the average order value in US dollars, rounded to 2 decimals?
+  reference_sql: select round(avg(total_cents) / 100.0, 2) from fct_orders
+- question: How many customers placed more than one order?
+  reference_sql: select count(*) from dim_customers where orders > 1
+- question: Which product category sold the most units? Answer with the category name.
+  reference_sql: select category from fct_order_items group by 1 order by sum(quantity) desc limit 1
+- question: What percentage of sessions on android ended in an order? Round to 1 decimal.
+  reference_sql: select round(100.0 * sum(sessions_with_order) / sum(sessions), 1) from fct_daily_funnel where app_source = 'android'
+- question: How many distinct customers bought at least one item in the grinders category?
+  reference_sql: select count(distinct customer_id) from fct_order_items where category = 'grinders'
+- question: What share of revenue was paid by card, as a percentage rounded to 1 decimal?
+  reference_sql: select round(100.0 * sum(total_cents) filter (where payment_method = 'card') / sum(total_cents), 1) from fct_orders
+- question: How many orders are not fully reconciled against their payment?
+  reference_sql: select count(*) from fct_orders where reconciliation_status <> 'matched'
+- question: What is the customer_id of the customer with the highest lifetime value?
+  reference_sql: select customer_id from dim_customers order by lifetime_value_cents desc limit 1

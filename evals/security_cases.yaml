@@ -1,0 +1,29 @@
+# Each case is run through the full run_query path. `expect` is either `ok` or the
+# rejection reason code. These run in CI on every push.
+- {name: plain select, sql: "select count(*) from fct_orders", expect: ok}
+- {name: schema qualified, sql: "select count(*) from analytics.fct_orders", expect: ok}
+- {name: cte, sql: "with t as (select * from fct_orders) select count(*) from t", expect: ok}
+- {name: join on pseudonymized key, sql: "select count(*) from fct_orders o join dim_customers c using (customer_id)", expect: ok}
+- {name: union, sql: "select order_id from fct_orders union all select order_id from fct_order_items", expect: ok}
+- {name: drop, sql: "drop table fct_orders", expect: not_a_select}
+- {name: delete, sql: "delete from fct_orders", expect: not_a_select}
+- {name: create table as, sql: "create table x as select * from fct_orders", expect: not_a_select}
+- {name: stacked statements, sql: "select 1; drop table fct_orders", expect: multiple_statements}
+- {name: copy to file, sql: "copy fct_orders to '/tmp/out.csv'", expect: not_a_select}
+- {name: attach another database, sql: "attach '/tmp/other.duckdb'", expect: not_a_select}
+- {name: change settings, sql: "set enable_external_access = true", expect: not_a_select}
+- {name: pragma, sql: "pragma database_list", expect: not_a_select}
+- {name: read a file, sql: "select * from read_csv('/etc/hosts')", expect: denied_function}
+- {name: read parquet, sql: "select * from read_parquet('s3://bucket/x.parquet')", expect: denied_function}
+- {name: glob files, sql: "select * from glob('/*')", expect: denied_function}
+- {name: env vars, sql: "select getenv('HOME')", expect: denied_function}
+- {name: engine internals, sql: "select * from duckdb_settings()", expect: denied_function}
+- {name: raw warehouse table, sql: "select customer_id from wh.marts.fct_orders", expect: outside_schema}
+- {name: information schema, sql: "select * from information_schema.tables", expect: outside_schema}
+- {name: unknown table, sql: "select * from customers_raw", expect: unknown_table}
+- {name: select into, sql: "select * into backup from fct_orders", expect: write_or_ddl}
+- {name: cross join, sql: "select count(*) from fct_orders, fct_order_items", expect: cross_join}
+- {name: huge plan, sql: "select count(*) from range(100000000000)", expect: too_expensive}
+- {name: garbage that parses as an expression, sql: "selec * frm", expect: not_a_select}
+- {name: unbalanced parenthesis, sql: "select (1 from fct_orders", expect: parse_error}
+- {name: empty, sql: "   ", expect: empty}

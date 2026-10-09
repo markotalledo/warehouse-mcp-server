@@ -1,0 +1,26 @@
+{
+  "fct_orders": {
+    "description": "One row per order. Reconciles the order total against its lines and against the captured payment. reconciliation_status is matched, amount_mismatch or unpaid.",
+    "columns": {
+      "order_id": "",
+      "customer_id": "",
+      "reconciliation_status": ""
+    }
+  },
+  "fct_order_items": {
+    "description": "One row per order line, with the product category and the difference against list price.",
+    "columns": {
+      "order_id": ""
+    }
+  },
+  "dim_customers": {
+    "description": "One row per identified customer, with first touch and lifetime value.",
+    "columns": {
+      "customer_id": ""
+    }
+  },
+  "fct_daily_funnel": {
+    "description": "Sessions per day and client, and how many reached each funnel step. Incremental: each run rebuilds the last funnel_lookback_days days.",
+    "columns": {}
+  }
+}
