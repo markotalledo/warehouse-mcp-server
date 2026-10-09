@@ -4,6 +4,10 @@ A read-only [MCP](https://modelcontextprotocol.io) server that lets Claude, Curs
 
 It is the fourth piece of a small end-to-end data platform for a fictional online coffee shop. It serves the marts built by [dbt-ecommerce-warehouse](https://github.com/markotalledo/dbt-ecommerce-warehouse).
 
+![A real MCP client answering business questions, getting pseudonymized customers back, and being refused writes, file reads, raw tables and a cross join](docs/demo.gif)
+
+The recording is a real MCP client talking to the server over stdio, the same way Claude Desktop does. Reproduce it with `uv run python examples/demo.py`, or re-record it with `vhs docs/demo.tape`.
+
 ```mermaid
 flowchart LR
     C[Claude Desktop<br/>Cursor<br/>any MCP client] -->|stdio| S[warehouse-mcp-server]
